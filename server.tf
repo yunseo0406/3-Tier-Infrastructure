@@ -8,12 +8,16 @@ resource "ncloud_server" "web" {
   server_image_product_code = var.server_image_number
   server_product_code  = var.web_spec_code
   login_key_name       = ncloud_login_key.this.key_name
+  network_interface   {
+      network_interface_no = ncloud_network_interface.web_nic.id
+      order = 0
+  }
 }
 
-resource "ncloud_access_control_group_server" "web_attach" {
-  count                   = var.web_count
-  access_control_group_no = ncloud_access_control_group.web_acg.id 
-  server_instance_no      = ncloud_server.web[count.index].id
+resource "ncloud_network_interface" "web_nic" {
+	name                  = "web-nic"
+	subnet_no             = ncloud_subnet.public.id
+	access_control_groups = [ncloud_access_control_group.web_acg.id]
 }
 
 ###################################
@@ -26,10 +30,14 @@ resource "ncloud_server" "was" {
   server_image_product_code = var.server_image_number
   server_product_code  = var.was_spec_code
   login_key_name       = ncloud_login_key.this.key_name
+  network_interface   {
+      network_interface_no = ncloud_network_interface.was_nic.id
+      order = 0
+  }
 }
 
-resource "ncloud_access_control_group_server" "was_attach" {
-  count                   = var.was_count
-  access_control_group_no = ncloud_access_control_group.was.id
-  server_instance_no      = ncloud_server.was[count.index].id
+resource "ncloud_network_interface" "was_nic" {
+	name                  = "was-nic"
+	subnet_no             = ncloud_subnet.private.id
+	access_control_groups = [ncloud_access_control_group.was_acg.id]
 }
