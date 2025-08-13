@@ -40,7 +40,6 @@ resource "ncloud_access_control_group" "was_acg" {
 resource "ncloud_access_control_group_rule" "was_rules" {
   access_control_group_no = ncloud_access_control_group.was_acg.id
 
-  # Web 대역에서만 Subnet WAS 포트 허용
   inbound {
     protocol   = "TCP"
     ip_block   = var.private_lb_cidr
