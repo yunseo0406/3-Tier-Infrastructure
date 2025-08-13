@@ -1,14 +1,14 @@
 terraform {
-    required_providers {
-      ncloud = {
-        source = "NaverCloudPlatform/ncloud"
-      }
+  required_providers {
+    ncloud = {
+      source = "NaverCloudPlatform/ncloud"
     }
-    required_version = ">= 0.13"
+  }
+  required_version = ">= 0.13"
 }
 
 provider "ncloud" {
-    region = "KR"
-    site = "public"
-    support_vpc = true
+  region      = "KR"
+  site        = "public"
+  support_vpc = true
 }

@@ -6,28 +6,28 @@ resource "ncloud_access_control_group" "web_acg" {
 
 resource "ncloud_access_control_group_rule" "web_rule" {
   access_control_group_no = ncloud_access_control_group.web_acg.id
-  
+
   inbound {
-    protocol = "TCP"
-    ip_block = "0.0.0.0/0"
+    protocol   = "TCP"
+    ip_block   = "0.0.0.0/0"
     port_range = tostring(var.web_port)
   }
 
   inbound {
-    protocol = "TCP"
-    ip_block = "0.0.0.0/0"
+    protocol   = "TCP"
+    ip_block   = "0.0.0.0/0"
     port_range = 22
   }
 
   inbound {
-    protocol    = "ICMP"
-    ip_block    = "0.0.0.0/0"
+    protocol = "ICMP"
+    ip_block = "0.0.0.0/0"
   }
 
   outbound {
-    protocol    = "TCP"
-    ip_block    = "0.0.0.0/0"
-    port_range  = "1-65535"
+    protocol   = "TCP"
+    ip_block   = "0.0.0.0/0"
+    port_range = "1-65535"
   }
 }
 
@@ -42,14 +42,14 @@ resource "ncloud_access_control_group_rule" "was_rules" {
 
   # Web 대역에서만 Subnet WAS 포트 허용
   inbound {
-    protocol = "TCP"
-    ip_block = var.public_cidr
-    port_range = tostring(var.was_port)
+    protocol   = "TCP"
+    ip_block   = var.private_lb_cidr
+    port_range = "8080"
   }
 
-  outbound { 
-    protocol = "TCP" 
-    ip_block = "0.0.0.0/0" 
-    port_range = "1-65535" 
+  outbound {
+    protocol   = "TCP"
+    ip_block   = "0.0.0.0/0"
+    port_range = "1-65535"
   }
 }
