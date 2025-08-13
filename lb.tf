@@ -26,10 +26,10 @@ resource "ncloud_lb_target_group" "ex_lb_target_group" {
 
 # external lb listener
 resource "ncloud_lb_listener" "ex_lb_listener" {
-  load_balancer_no = ncloud_lb.external_lb.load_balancer_no
+  load_balancer_no = ncloud_lb.external_lb.id
   protocol = "HTTP"
   port = 80
-  target_group_no = ncloud_lb_target_group.ex_lb_target_group.target_group_no
+  target_group_no = ncloud_lb_target_group.ex_lb_target_group.id
 }
 
 # external lb target group attachment

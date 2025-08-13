@@ -44,12 +44,12 @@ variable "private_lb_cidr" {
 ###################################
 variable "web_count" {
   type        = number
-  default     = 2
+  default     = 1
 }
 
 variable "was_count" {
   type        = number
-  default     = 2
+  default     = 1
 }
 
 variable "server_image_number" {
