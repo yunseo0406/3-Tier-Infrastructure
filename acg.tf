@@ -13,7 +13,7 @@ resource "ncloud_access_control_group_rule" "web_rule" {
 
   inbound {
     protocol   = "TCP"
-    ip_block   = var.operator_cidr
+    ip_block   = var.public_cidr
     port_range = "22"
   }
 
@@ -22,15 +22,7 @@ resource "ncloud_access_control_group_rule" "web_rule" {
     ip_block =   var.public_lb_cidr
     port_range = tostring(var.web_port)
   }
-  inbound {
-    protocol = "ICMP"
-    ip_block = var.operator_cidr
-  }
-  outbound {
-    protocol   = "TCP"
-    ip_block   = var.private_cidr
-    port_range = "22"
-  }
+
   outbound {
     protocol   = "TCP"
     ip_block   = "0.0.0.0/0"
@@ -42,6 +34,10 @@ resource "ncloud_access_control_group_rule" "web_rule" {
 resource "ncloud_access_control_group" "was_acg" {
   name   = "${var.project}-was-acg"
   vpc_no = ncloud_vpc.this.id
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "ncloud_access_control_group_rule" "was_rules" {
@@ -49,7 +45,7 @@ resource "ncloud_access_control_group_rule" "was_rules" {
 
   inbound {
     protocol   = "TCP"
-    ip_block   = var.private_cidr
+    ip_block   = var.public_cidr
     port_range = "22"
   }
 
@@ -64,10 +60,35 @@ resource "ncloud_access_control_group_rule" "was_rules" {
     ip_block   = "0.0.0.0/0"
     port_range = "1-65535"
   }
+}
+
+# Bastion ACG (운영자 -> Bastion, Bation->Web,Was)
+resource "ncloud_access_control_group" "bastion_acg" {
+  name   = "${var.project}-bastion-acg"
+  vpc_no = ncloud_vpc.this.id
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "ncloud_access_control_group_rule" "bastion_rule" {
+  access_control_group_no = ncloud_access_control_group.bastion_acg.id
+
+  inbound {
+    protocol   = "TCP"
+    ip_block   = var.operator_cidr
+    port_range = "22"
+  }
 
   outbound {
     protocol   = "TCP"
-    ip_block   = var.db_subnet_cidr
-    port_range = "3306"
+    ip_block   = var.public_cidr    # Web 서브넷
+    port_range = "22"
+  }
+  outbound {
+    protocol   = "TCP"
+    ip_block   = var.private_cidr   # WAS 서브넷
+    port_range = "22"
   }
 }
