@@ -2,6 +2,10 @@
 resource "ncloud_access_control_group" "web_acg" {
   name   = "${var.project}-web-acg"
   vpc_no = ncloud_vpc.this.id
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "ncloud_access_control_group_rule" "web_rule" {
@@ -9,21 +13,24 @@ resource "ncloud_access_control_group_rule" "web_rule" {
 
   inbound {
     protocol   = "TCP"
-    ip_block   = "0.0.0.0/0"
+    ip_block   = var.operator_cidr
+    port_range = "22"
+  }
+
+  inbound {
+    protocol = "TCP"
+    ip_block =   var.public_lb_cidr
     port_range = tostring(var.web_port)
   }
-
-  inbound {
-    protocol   = "TCP"
-    ip_block   = "0.0.0.0/0"
-    port_range = 22
-  }
-
   inbound {
     protocol = "ICMP"
-    ip_block = "0.0.0.0/0"
+    ip_block = var.operator_cidr
   }
-
+  outbound {
+    protocol   = "TCP"
+    ip_block   = var.private_cidr
+    port_range = "22"
+  }
   outbound {
     protocol   = "TCP"
     ip_block   = "0.0.0.0/0"
@@ -42,6 +49,12 @@ resource "ncloud_access_control_group_rule" "was_rules" {
 
   inbound {
     protocol   = "TCP"
+    ip_block   = var.private_cidr
+    port_range = "22"
+  }
+
+  inbound {
+    protocol   = "TCP"
     ip_block   = var.private_lb_cidr
     port_range = "8080"
   }
@@ -50,5 +63,11 @@ resource "ncloud_access_control_group_rule" "was_rules" {
     protocol   = "TCP"
     ip_block   = "0.0.0.0/0"
     port_range = "1-65535"
+  }
+
+  outbound {
+    protocol   = "TCP"
+    ip_block   = var.db_subnet_cidr
+    port_range = "3306"
   }
 }

@@ -49,3 +49,14 @@ resource "ncloud_subnet" "private_lb" {
   usage_type     = "LOADB"
   network_acl_no = ncloud_vpc.this.default_network_acl_no
 }
+
+# Private Subnet (WAS)
+resource "ncloud_subnet" "mysql_subnet" {
+  name           = "${var.project}-cdb-subnet"
+  vpc_no         = ncloud_vpc.this.id
+  subnet         = var.db_subnet_cidr
+  zone           = var.zone
+  subnet_type    = "PRIVATE"
+  usage_type     = "GEN"
+  network_acl_no = ncloud_vpc.this.default_network_acl_no
+}
