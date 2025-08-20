@@ -36,6 +36,10 @@ resource "ncloud_network_interface" "web_nic" {
   subnet_no             = ncloud_subnet.public.id
   access_control_groups = [ncloud_access_control_group.web_acg.id]
 }
+# 공인 ip
+resource "ncloud_public_ip" "web_eip" {
+  server_instance_no = ncloud_server.web.id
+}
 
 ###################################
 # WAS Servers (Private)
@@ -58,32 +62,4 @@ resource "ncloud_network_interface" "was_nic" {
   name                  = "was-nic"
   subnet_no             = ncloud_subnet.private.id
   access_control_groups = [ncloud_access_control_group.was_acg.id]
-}
-
-###################################
-# Bastion Server (Public Subnet, EIP 부착)
-###################################
-resource "ncloud_server" "bastion" {
-  name                = "${var.project}-bastion"
-  subnet_no           = ncloud_subnet.public.id
-  server_image_number = data.ncloud_server_image_numbers.kvm-image.image_number_list.0.server_image_number
-  server_spec_code    = data.ncloud_server_specs.kvm-spec.server_spec_list.0.server_spec_code
-  login_key_name      = ncloud_login_key.this.key_name  
-
-  network_interface {
-    network_interface_no = ncloud_network_interface.bastion_nic.id
-    order                = 0
-  }
-}
-
-resource "ncloud_network_interface" "bastion_nic" {
-  name                  = "bastion-nic"
-  subnet_no             = ncloud_subnet.public.id
-  access_control_groups = [ ncloud_access_control_group.bastion_acg.id ]
-}
-
-# 공인 ip
-resource "ncloud_public_ip" "bastion_eip" {
-  server_instance_no = ncloud_server.bastion.id
-  description        = "bastion eip"
 }

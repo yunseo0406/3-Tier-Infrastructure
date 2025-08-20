@@ -13,7 +13,7 @@ resource "ncloud_access_control_group_rule" "web_rule" {
 
   inbound {
     protocol   = "TCP"
-    ip_block   = var.public_cidr
+    ip_block   =  "0.0.0.0/0"
     port_range = "22"
   }
 
@@ -62,33 +62,27 @@ resource "ncloud_access_control_group_rule" "was_rules" {
   }
 }
 
-# Bastion ACG (운영자 -> Bastion, Bation->Web,Was)
-resource "ncloud_access_control_group" "bastion_acg" {
-  name   = "${var.project}-bastion-acg"
+# MYSQL ACG
+resource "ncloud_access_control_group" "mysql_acg" {
+  name   = "${var.project}-mysql-acg"
   vpc_no = ncloud_vpc.this.id
-
   lifecycle {
     create_before_destroy = true
   }
 }
 
-resource "ncloud_access_control_group_rule" "bastion_rule" {
-  access_control_group_no = ncloud_access_control_group.bastion_acg.id
+resource "ncloud_access_control_group_rule" "mysql_rules" {
+  access_control_group_no = ncloud_access_control_group.mysql_acg.id
 
   inbound {
     protocol   = "TCP"
-    ip_block   = var.operator_cidr
-    port_range = "22"
+    ip_block   = var.private_cidr
+    port_range = "3306"
   }
 
   outbound {
     protocol   = "TCP"
-    ip_block   = var.public_cidr    # Web 서브넷
-    port_range = "22"
-  }
-  outbound {
-    protocol   = "TCP"
-    ip_block   = var.private_cidr   # WAS 서브넷
-    port_range = "22"
+    ip_block   = "0.0.0.0/0"
+    port_range = "1-65535"
   }
 }
