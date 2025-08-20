@@ -18,8 +18,7 @@ data "ncloud_server_specs" "kvm-spec" {
 # Web Servers (Public)
 ###################################
 resource "ncloud_server" "web" {
-  count                     = var.web_count
-  name                      = "${var.project}-web-${count.index + 1}"
+  name                      = "${var.project}-web"
   subnet_no                 = ncloud_subnet.public.id
   server_image_number       = data.ncloud_server_image_numbers.kvm-image.image_number_list.0.server_image_number
   server_spec_code          = data.ncloud_server_specs.kvm-spec.server_spec_list.0.server_spec_code
@@ -45,8 +44,7 @@ resource "ncloud_public_ip" "web_eip" {
 # WAS Servers (Private)
 ###################################
 resource "ncloud_server" "was" {
-  count                     = var.was_count
-  name                      = "${var.project}-was-${count.index + 1}"
+  name                      = "${var.project}-was"
   subnet_no                 = ncloud_subnet.private.id
   server_image_number       = data.ncloud_server_image_numbers.kvm-image.image_number_list.0.server_image_number
   server_spec_code          = data.ncloud_server_specs.kvm-spec.server_spec_list.0.server_spec_code

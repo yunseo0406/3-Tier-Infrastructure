@@ -37,7 +37,7 @@ resource "ncloud_lb_listener" "ex_lb_listener" {
 # external lb target group attachment
 resource "ncloud_lb_target_group_attachment" "ex_lb_target_group_attach" {
   target_group_no = ncloud_lb_target_group.ex_lb_target_group.id
-  target_no_list  = [for s in ncloud_server.web : s.id]
+  target_no_list  = [ncloud_server.web.id]
 
   depends_on = [
     ncloud_lb_target_group.ex_lb_target_group,
@@ -84,7 +84,7 @@ resource "ncloud_lb_listener" "in_nlb_listener" {
 # internal lb target group attachment
 resource "ncloud_lb_target_group_attachment" "in_nlb_attach" {
   target_group_no = ncloud_lb_target_group.in_nlb_target_group.target_group_no
-  target_no_list  = [for s in ncloud_server.was : s.id]
+  target_no_list  = [ncloud_server.was.id]
   depends_on = [
     ncloud_lb_target_group.in_nlb_target_group,
     ncloud_server.was
