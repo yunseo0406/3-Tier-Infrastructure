@@ -39,16 +39,17 @@ variable "private_lb_cidr" {
   default = "10.0.20.0/24"
 }
 
+variable "natgw_cidr"      { 
+    type = string 
+    default = "10.0.30.0/24"
+}
+
 variable "db_subnet_cidr" {
   type    = string
   default = "10.0.100.0/24"
   
 }
 
-variable "operator_cidr"      { 
-    type = string 
-    default = "1.209.110.74/32"
-}
 
 ###################################
 # 서버 설정
