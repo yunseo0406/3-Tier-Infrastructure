@@ -13,13 +13,13 @@ resource "ncloud_access_control_group_rule" "web_rule" {
 
   inbound {
     protocol   = "TCP"
-    ip_block   =  "0.0.0.0/0"
+    ip_block   = "0.0.0.0/0"
     port_range = "22"
   }
 
   inbound {
-    protocol = "TCP"
-    ip_block =   var.public_lb_cidr
+    protocol   = "TCP"
+    ip_block   = var.public_lb_cidr
     port_range = tostring(var.web_port)
   }
 
@@ -53,31 +53,6 @@ resource "ncloud_access_control_group_rule" "was_rules" {
     protocol   = "TCP"
     ip_block   = var.private_lb_cidr
     port_range = "8080"
-  }
-
-  outbound {
-    protocol   = "TCP"
-    ip_block   = "0.0.0.0/0"
-    port_range = "1-65535"
-  }
-}
-
-# MYSQL ACG
-resource "ncloud_access_control_group" "mysql_acg" {
-  name   = "${var.project}-mysql-acg"
-  vpc_no = ncloud_vpc.this.id
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-resource "ncloud_access_control_group_rule" "mysql_rules" {
-  access_control_group_no = ncloud_access_control_group.mysql_acg.id
-
-  inbound {
-    protocol   = "TCP"
-    ip_block   = var.private_cidr
-    port_range = "3306"
   }
 
   outbound {

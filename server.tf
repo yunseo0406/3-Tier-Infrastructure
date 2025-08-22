@@ -2,7 +2,7 @@
 data "ncloud_server_image_numbers" "kvm-image" {
   server_image_name = "ubuntu-22.04-base"
   filter {
-    name = "hypervisor_type"
+    name   = "hypervisor_type"
     values = ["KVM"]
   }
 }
@@ -18,11 +18,12 @@ data "ncloud_server_specs" "kvm-spec" {
 # Web Servers (Public)
 ###################################
 resource "ncloud_server" "web" {
-  name                      = "${var.project}-web"
-  subnet_no                 = ncloud_subnet.public.id
-  server_image_number       = data.ncloud_server_image_numbers.kvm-image.image_number_list.0.server_image_number
-  server_spec_code          = data.ncloud_server_specs.kvm-spec.server_spec_list.0.server_spec_code
-  login_key_name            = ncloud_login_key.this.key_name
+  name                = "${var.project}-web"
+  subnet_no           = ncloud_subnet.public.id
+  server_image_number = data.ncloud_server_image_numbers.kvm-image.image_number_list.0.server_image_number
+  server_spec_code    = data.ncloud_server_specs.kvm-spec.server_spec_list.0.server_spec_code
+  login_key_name      = ncloud_login_key.this.key_name
+  init_script_no      = ncloud_init_script.web_apache.id
 
   network_interface {
     network_interface_no = ncloud_network_interface.web_nic.id
@@ -44,11 +45,12 @@ resource "ncloud_public_ip" "web_eip" {
 # WAS Servers (Private)
 ###################################
 resource "ncloud_server" "was" {
-  name                      = "${var.project}-was"
-  subnet_no                 = ncloud_subnet.private.id
-  server_image_number       = data.ncloud_server_image_numbers.kvm-image.image_number_list.0.server_image_number
-  server_spec_code          = data.ncloud_server_specs.kvm-spec.server_spec_list.0.server_spec_code
-  login_key_name            = ncloud_login_key.this.key_name
+  name                = "${var.project}-was"
+  subnet_no           = ncloud_subnet.private.id
+  server_image_number = data.ncloud_server_image_numbers.kvm-image.image_number_list.0.server_image_number
+  server_spec_code    = data.ncloud_server_specs.kvm-spec.server_spec_list.0.server_spec_code
+  login_key_name      = ncloud_login_key.this.key_name
+  init_script_no      = ncloud_init_script.was_tomcat.id
 
   network_interface {
     network_interface_no = ncloud_network_interface.was_nic.id

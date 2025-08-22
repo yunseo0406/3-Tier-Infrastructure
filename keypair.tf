@@ -7,9 +7,5 @@ resource "ncloud_login_key" "this" {
 resource "local_file" "login_key_pem" {
   content         = ncloud_login_key.this.private_key
   filename        = "${path.module}/${ncloud_login_key.this.key_name}.pem"
-  file_permission = "0400"  
+  file_permission = "0400"
 }
-
-# 출력
-output "login_key_name"     { value = ncloud_login_key.this.key_name }
-output "login_key_pem_path" { value = local_file.login_key_pem.filename }

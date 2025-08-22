@@ -1,5 +1,5 @@
 ###################################
-# VPC & Subnets
+# VPC & Subnets & NAT Gateway
 ###################################
 resource "ncloud_vpc" "this" {
   name            = "${var.project}-vpc"
@@ -50,17 +50,6 @@ resource "ncloud_subnet" "private_lb" {
   network_acl_no = ncloud_vpc.this.default_network_acl_no
 }
 
-# MYSQL Subnet
-resource "ncloud_subnet" "mysql_subnet" {
-  name           = "${var.project}-cdb-subnet"
-  vpc_no         = ncloud_vpc.this.id
-  subnet         = var.db_subnet_cidr
-  zone           = var.zone
-  subnet_type    = "PRIVATE"
-  usage_type     = "GEN"
-  network_acl_no = ncloud_vpc.this.default_network_acl_no
-}
-
 #####################################
 # Nat Gateway
 #####################################
@@ -74,24 +63,24 @@ resource "ncloud_subnet" "natgw_subnet" {
   usage_type     = "NATGW"
 }
 resource "ncloud_nat_gateway" "nat_gateway" {
-  vpc_no      = ncloud_vpc.this.id
-  subnet_no   = ncloud_subnet.natgw_subnet.id
-  zone        = var.zone
-  name        = "nat-gw"
+  vpc_no    = ncloud_vpc.this.id
+  subnet_no = ncloud_subnet.natgw_subnet.id
+  zone      = var.zone
+  name      = "nat-gw"
 }
 resource "ncloud_route_table" "private_rt" {
-  vpc_no                = ncloud_vpc.this.id  
-  supported_subnet_type = "PRIVATE" 
+  vpc_no                = ncloud_vpc.this.id
+  supported_subnet_type = "PRIVATE"
   name                  = "route-table"
 }
 resource "ncloud_route" "nat_default" {
   route_table_no         = ncloud_route_table.private_rt.id
   destination_cidr_block = "0.0.0.0/0"
-  target_type            = "NATGW"  
+  target_type            = "NATGW"
   target_name            = ncloud_nat_gateway.nat_gateway.name
   target_no              = ncloud_nat_gateway.nat_gateway.id
 }
 resource "ncloud_route_table_association" "route_table_subnet" {
-    route_table_no        = ncloud_route_table.private_rt.id
-    subnet_no             = ncloud_subnet.private.id
+  route_table_no = ncloud_route_table.private_rt.id
+  subnet_no      = ncloud_subnet.private.id
 }
