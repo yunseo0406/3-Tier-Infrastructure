@@ -13,17 +13,8 @@ resource "ncloud_subnet" "mysql_subnet" {
   network_acl_no = ncloud_vpc.this.default_network_acl_no
 }
 
-#MYSQL ACG
-resource "ncloud_access_control_group" "mysql_acg" {
-  name   = "${var.project}-mysql-acg"
-  vpc_no = ncloud_vpc.this.id
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-resource "ncloud_access_control_group_rule" "mysql_rules" {
-  access_control_group_no = ncloud_access_control_group.mysql_acg.id
+resource "ncloud_access_control_group_rule" "cdb_default_rules" {
+  access_control_group_no = element(ncloud_mysql.mysql.access_control_group_no_list, 0)
 
   inbound {
     protocol   = "TCP"
@@ -46,13 +37,6 @@ resource "ncloud_mysql" "mysql" {
   user_password = "qwer1234!"
   host_ip = var.private_cidr
   database_name = "yunseo_db"
-}
-
-resource "ncloud_network_interface" "mysql_nic" {
-  name                  = "mysql-nic"
-  subnet_no             = ncloud_subnet.mysql_subnet.id
-  access_control_groups = [ncloud_access_control_group.mysql_acg.id]
-  server_instance_no = ncloud_mysql.mysql.id
 }
 
 resource "ncloud_mysql_databases" "mysql_db" {
